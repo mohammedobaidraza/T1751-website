@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>T1751 — Where First-Time Founders Take Their First Flight</title>
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      /* Brand (light) */
+      --olive: #2f5d46;
+      --olive-600: #274c39;
+      --olive-300: #9fb9a9;
+      --olive-100: #e8efe9;
+      --bg: #ffffff;
+      --text: #1f2a24;
+      --text-muted: #51685d;
+      --border: #edf2ee;
+      --surface: #f8faf9;
+      --card-bg: rgba(47, 93, 70, .08);
+      --nav-bg: rgba(255, 255, 255, .95);
+    }
+
+    /* Grey-ish dark mode with golden olive accents */
+    body.dark {
+      --bg: #2a2e2c;
+      --surface: #323735;
+      --text: #e9eeeb;
+      --text-muted: #c8d2cd;
+      --border: #3a403e;
+      --card-bg: rgba(47, 93, 70, .18);
+      --nav-bg: rgba(42, 46, 44, .95);
+      --olive: #fbbf24;
+      --olive-600: #f59e0b;
+      --olive-300: #fcd34d;
+      --olive-100: rgba(251, 191, 36, .15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background .3s, color .3s
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 80px;
+      padding: 16px 50px;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      transition: box-shadow .25s, padding .25s
+    }
+
+    nav.scrolled {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .12);
+      padding: 12px 50px
+    }
+
+    body.dark nav.scrolled {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .28)
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--olive-600);
+      font-weight: 800;
+      font-size: clamp(22px, 3vw, 32px)
+    }
+
+    .logo img {
+      height: clamp(150px, 10vw, 100px);
+      width: auto;
+      display: block;
+      transition: transform .25s, filter .25s
+    }
+
+    nav.scrolled .logo img {
+      transform: scale(.95)
+    }
+
+    body.dark .logo img {
+      filter: contrast(1.08) brightness(1.03)
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 18px;
+      align-items: center
+    }
+
+    .nav-links a {
+      color: var(--olive-600);
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 15px
+    }
+
+    .nav-links a:hover {
+      color: var(--olive)
+    }
+
+    .apply-btn {
+      background: var(--olive);
+      color: #fff !important;
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-weight: 900
+    }
+
+    .theme-toggle {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--olive-600);
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 900
+    }
+
+    .theme-toggle:hover {
+      background: var(--card-bg);
+      border-color: var(--olive-300)
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+      cursor: pointer
+    }
+
+    .mobile-menu-btn span {
+      width: 24px;
+      height: 3px;
+      background: var(--olive-600);
+      border-radius: 2px
+    }
+
+    /* Canvas bg */
+    #three-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 0 20px
+    }
+
+    .hero-content {
+      max-width: 900px
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--card-bg);
+      border: 1px solid var(--olive-300);
+      color: var(--olive-600);
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 800;
+      margin-bottom: 22px
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 4.4rem);
+      background: linear-gradient(135deg, var(--olive) 0%, var(--olive-600) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+      font-weight: 900;
+      margin-bottom: 12px
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 3.5vw, 1.35rem);
+      color: var(--olive-600);
+      font-weight: 900;
+      margin-bottom: 10px
+    }
+
+    .hero p {
+      font-size: clamp(1rem, 3vw, 1.1rem);
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto 28px
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-weight: 900;
+      display: inline-block
+    }
+
+    .btn-primary {
+      background: var(--olive);
+      color: #fff
+    }
+
+    .btn-secondary {
+      border: 2px solid var(--olive);
+      color: var(--olive);
+      background: transparent
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: clamp(72px, 10vw, 110px) 20px;
+      max-width: 1200px;
+      margin: 0 auto
+    }
+
+    .section h2 {
+      text-align: center;
+      font-size: clamp(2.2rem, 6vw, 3.2rem);
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, var(--olive) 0%, var(--olive-600) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 900
+    }
+
+    .section p {
+      font-size: clamp(1.04rem, 3vw, 1.15rem);
+      line-height: 1.8;
+      color: var(--text-muted);
+      max-width: 820px;
+      margin: 0 auto 20px
+    }
+
+    .highlight-text {
+      color: var(--olive);
+      font-weight: 900
+    }
+
+    /* STORY */
+    .story-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 44px;
+      align-items: center;
+      margin-top: 36px
+    }
+
+    .story-text p {
+      text-align: left;
+      margin-bottom: 16px
+    }
+
+    .story-subhead {
+      margin: 16px 0 8px;
+      font-weight: 900;
+      color: var(--olive-600)
+    }
+
+    .story-visual {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      display: flex;
+      justify-content: center
+    }
+
+    .hero-art {
+      margin: 0;
+      text-align: center
+    }
+
+    .hero-art-img {
+      width: 100%;
+      max-width: 320px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 12px 28px rgba(47, 93, 70, .12)
+    }
+
+    .story-caption {
+      margin-top: 10px;
+      color: var(--olive-600);
+      font-style: italic;
+      font-weight: 800
+    }
+
+    /* Legacy row */
+    .legacy-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: stretch;
+      margin: 50px auto 0;
+      padding: 0 20px;
+      max-width: 1200px
+    }
+
+    .ring-card,
+    .legacy-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 26px
+    }
+
+    .ring-card {
+      display: flex;
+      justify-content: center;
+      align-items: center
+    }
+
+    .ring-img {
+      width: 100%;
+      max-width: 360px;
+      border-radius: 10px
+    }
+
+    .legacy-box {
+      text-align: center;
+      display: grid;
+      place-items: center
+    }
+
+    .legacy-quote {
+      font-size: clamp(1.04rem, 3vw, 1.18rem);
+      font-style: italic;
+      color: var(--olive-600);
+      line-height: 1.6
+    }
+
+    /* APPLY */
+    .apply-section {
+      min-height: 100vh;
+      display: flex;
+      background: linear-gradient(180deg, var(--bg), var(--surface))
+    }
+
+    .apply-half {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 72px 36px;
+      transition: transform .2s, background .2s
+    }
+
+    .apply-half:hover {
+      background: var(--card-bg);
+      transform: scale(1.01)
+    }
+
+    .apply-content {
+      max-width: 460px;
+      text-align: center
+    }
+
+    .apply-icon {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      background: var(--olive);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      box-shadow: 0 0 22px rgba(47, 93, 70, .22)
+    }
+
+    .apply-features {
+      list-style: none;
+      margin: 0 0 24px;
+      text-align: left
+    }
+
+    .apply-features li {
+      padding: 8px 0;
+      font-size: 19px;
+      color: var(--text-muted)
+    }
+
+    .apply-features li::before {
+      content: '▸';
+      color: var(--olive);
+      margin-right: 10px;
+      font-weight: 900
+    }
+
+    /* FAQ */
+    .faq-subhead {
+      text-align: center;
+      color: var(--olive-600);
+      margin: 18px 0 14px;
+      font-weight: 900
+    }
+
+    .faq {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      gap: 12px
+    }
+
+    details.faq-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      transition: box-shadow .2s, background .2s
+    }
+
+    details.faq-item[open] {
+      box-shadow: 0 8px 20px rgba(47, 93, 70, .12);
+      background: var(--card-bg)
+    }
+
+    details.faq-item>summary {
+      cursor: pointer;
+      list-style: none;
+      font-weight: 900;
+      color: var(--olive-600);
+      font-size: 16px
+    }
+
+    details.faq-item>summary::-webkit-details-marker {
+      display: none
+    }
+
+    details.faq-item>summary:after {
+      content: "▾";
+      float: right;
+      transition: transform .2s;
+      color: var(--olive-600)
+    }
+
+    details.faq-item[open]>summary:after {
+      transform: rotate(180deg)
+    }
+
+    .faq-body {
+      margin-top: 10px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      font-size: 15px
+    }
+
+    /* Fade-in on scroll */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity .8s, transform .8s
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    /* Responsive */
+    @media (max-width:1024px) {
+      .legacy-row {
+        grid-template-columns: 1fr
+      }
+
+      .ring-img {
+        max-width: 300px;
+        margin: 0 auto
+      }
+    }
+
+    @media (max-width:768px) {
+      nav {
+        padding: 12px 20px
+      }
+
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--nav-bg);
+        flex-direction: column;
+        padding: 16px;
+        gap: 12px;
+        border-top: 1px solid var(--border)
+      }
+
+      .nav-links.active {
+        display: flex
+      }
+
+      .mobile-menu-btn {
+        display: flex
+      }
+
+      .hero {
+        padding-top: 100px
+      }
+
+      .section {
+        padding: 60px 20px
+      }
+
+      .story-content {
+        grid-template-columns: 1fr;
+        gap: 32px
+      }
+
+      .story-text p {
+        text-align: center
+      }
+
+      .apply-section {
+        flex-direction: column
+      }
+    }
+
+    @media (max-width:480px) {
+      .section {
+        padding: 50px 16px
+      }
+
+      .legacy-row {
+        padding: 0 16px
+      }
+
+      .apply-half {
+        padding: 50px 20px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Background Canvas -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- NAV -->
+  <nav id="navbar" role="navigation" aria-label="Primary">
+    <div class="nav-container">
+      <div class="logo">
+        <img src="assests/3_green-removebg-preview.png" alt="T1751 Logo" />
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="#story">Story</a></li>
+        <li><a href="#mission">Mission</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><button id="theme-toggle" class="theme-toggle" aria-label="Toggle color mode">🌙</button></li>
+        <li><a href="#apply" class="apply-btn">Apply</a></li>
+      </ul>
+
+      <div class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Where First-Time Founders Take Their First Flight</div>
+      <h1>T1751</h1>
+      <div class="hero-subtitle">A Launchpad Built for Beginnings</div>
+      <p>Inspired by the legacy of courage and vision, we help first-time founders transform ideas into impact.
+        Every great founder begins somewhere. Begin here.</p>
+      <div class="hero-cta">
+        <a href="#apply" class="btn btn-primary">Start Your Journey</a>
+        <a href="#story" class="btn btn-secondary">Our Legacy</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY -->
+  <section id="story" class="section fade-in" aria-labelledby="story-title">
+    <h2 id="story-title">Why T1751?</h2>
+
+    <div class="story-content">
+      <!-- LEFT: Copy -->
+      <div class="story-text">
+        <p>
+          <strong class="highlight-text">T1751 is more than a name.</strong>
+          It is a tribute to the year 1751, the birth year of <strong>Tipu Sultan</strong>, a leader remembered for his
+          courage, vision, and relentless pursuit of progress. He was known as the
+          <strong class="highlight-text">Tiger of Mysore</strong>, a symbol of resistance, innovation, and resilience in
+          the face of overwhelming odds.
+        </p>
+
+        <h4 class="story-subhead">Tipu Sultan — The Innovator</h4>
+        <p>
+          Tipu Sultan (1751–1799) wasn’t just a formidable ruler; he was a pragmatic innovator. Under his leadership,
+          Mysore standardized <strong>iron-cased rockets</strong> with dedicated rocket brigades, an early example of
+          state-backed R&amp;D and battlefield deployment. He modernized the army with
+          <strong>specialized corps, foundries, and armories</strong>, and invested in logistics and fortifications
+          around
+          Srirangapatna. Beyond the military, he pushed <strong>economic and industrial experiments</strong> from
+          <strong>silk sericulture</strong> and weaving centers to <strong>state-managed trade</strong> in strategic
+          goods,
+          and drove <strong>administrative standardization</strong> in coinage, weights, and records so the state could
+          learn faster and scale what worked.
+        </p>
+      </div>
+
+      <!-- RIGHT: Image card -->
+      <div class="story-visual">
+        <figure class="hero-art">
+          <!-- Ensure this exists at assets/960px-TipuSultan1790-removebg-preview.png -->
+          <img src="assests/960px-TipuSultan1790-removebg-preview.png" alt="Portrait of Tipu Sultan"
+            class="hero-art-img" loading="lazy" decoding="async" />
+          <figcaption class="story-caption">“Tiger of Mysore”</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- Row below: Ring beside the quote card -->
+    <div class="legacy-row" aria-label="Legacy & Symbolism">
+      <div class="ring-card">
+        <!-- Ensure this exists at assets/tipu_ring-removebg-preview.png -->
+        <img src="assests/tipu_ring-removebg-preview.png" alt="Engraved ring associated with Tipu Sultan"
+          class="ring-img" loading="lazy" decoding="async" />
+      </div>
+
+      <div class="legacy-box">
+        <div class="legacy-quote">
+          “Together, T1751 and the Huma bird embody the spirit of our mission: to help founders begin, persist, and
+          grow.
+          We are not just an incubator. We are a launchpad where ideas take flight, guided by discipline, community, and
+          vision.”
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION -->
+  <section id="mission" class="section fade-in">
+    <h2>Our Mission</h2>
+    <p><strong class="highlight-text">T1751 is a launchpad for founders inspired by Tipu Sultan's legacy.</strong> Named
+      after his birth year, our emblem, the Huma bird, symbolizes leadership and destiny. We exist to help ideas take
+      flight with structure, discipline, and community.</p>
+    <p>We believe that <strong class="highlight-text">courage, vision, and resilience</strong> are the foundations of
+      every successful venture. Just as the Tiger of Mysore never gave up in the face of adversity, we support founders
+      who dare to dream big and persist through challenges.</p>
+    <p>Our mission is to guide first-time founders to lasting impact, ensuring that wherever our shadow falls,
+      leadership and fortune follow.</p>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="section fade-in">
+    <h2>What You Get</h2>
+    <p>At T1751, we provide more than funding, we offer a <strong class="highlight-text">complete ecosystem for
+        first-time founders</strong>. Our comprehensive program includes seed capital, mentorship from seasoned
+      entrepreneurs, and access to a network of industry leaders who understand the journey from idea to impact.</p>
+    <p>You'll join a community built on the principles of <strong class="highlight-text">courage, persistence, and
+        vision</strong>. Our alumni network spans across industries and continents, united by the shared experience of
+      taking their first flight with T1751.</p>
+    <p>Like the Huma bird that soars endlessly, we believe in supporting founders for the long journey ahead, from
+      their first step to lifetime leadership.</p>
+  </section>
+
+  <!-- APPLY -->
+  <section id="apply" class="apply-section">
+    <div class="apply-half">
+      <div class="apply-content">
+        <div class="apply-icon">🚀</div>
+        <h3>Venture Circle</h3>
+        <p>For first-time founders with early traction and a clear vision for scale. Perfect for those ready to
+          accelerate their proven concept.</p>
+        <ul class="apply-features">
+          <li>$250K - $500K investment</li>
+          <li>6-month acceleration program</li>
+          <li>Executive mentorship network</li>
+          <li>Investor introduction sessions</li>
+          <li>Strategic partnership facilitation</li>
+          <li>Tiger of Mysore resilience training</li>
+        </ul>
+        <a href="https://forms.gle/nat7TvWo8CLFvw728" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+          Apply to Venture Circle
+        </a>
+      </div>
+    </div>
+
+    <div class="apply-half">
+      <div class="apply-content">
+        <div class="apply-icon">💡</div>
+        <h3>Idea Circle</h3>
+        <p>For first-time entrepreneurs with innovative ideas seeking to build their first MVP and take their very first
+          flight in entrepreneurship.</p>
+        <ul class="apply-features">
+          <li>$50K - $100K seed funding</li>
+          <li>12-week incubation program</li>
+          <li>Founder-mentor pairing</li>
+          <li>Product development support</li>
+          <li>Market validation guidance</li>
+          <li>Huma bird leadership development</li>
+        </ul>
+        <a href="https://forms.gle/FsLgvhVdCi1vkExi7" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+          Apply to Idea Circle
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="section fade-in">
+    <h2>T1751 – Frequently Asked Questions</h2>
+
+    <!-- <h3 class="faq-subhead">Logistics</h3> -->
+    <div class="faq">
+      <details class="faq-item">
+        <summary>What happens at T1751?</summary>
+        <div class="faq-body">
+          A focused, founder-first program: weekly workshops, 1:1s with operators, office hours, GTM/fundraising prep,
+          and a strong peer cohort. You graduate with clearer focus, real customer feedback, and an investor-ready
+          story.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Where does the program happen? Do I need to move?</summary>
+        <div class="faq-body">
+          Remote-first with optional in-person meetups. You don’t need to relocate; we design around global time zones.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How do you choose which startups to fund?</summary>
+        <div class="faq-body">
+          Founder grit &amp; speed, insight into a real problem, early customer signals (even tiny), and a credible path
+          to learn fast. Warm intros aren’t required.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>How much do you invest and on what terms?</summary>
+        <div class="faq-body">
+          A standard pre-seed check on a founder-friendly SAFE, with potential follow-on.
+          Exact terms are shared at interview/offer stage and listed on the Apply page.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What’s the time commitment &amp; when are batches?</summary>
+        <div class="faq-body">
+          Plan ~5–10 hrs/week for live sessions, mentor time, and customer work.
+          Batch dates and calendars are posted on the Apply page.
+        </div>
+      </details>
+    </div>
+
+    <!-- <h3 class="faq-subhead">Should I apply?</h3> -->
+    <div class="faq">
+      <details class="faq-item">
+        <summary>Am I too early or too far along (already raised)?</summary>
+        <div class="faq-body">
+          We back everything from napkin-stage to post-seed if you’re still searching for product–market fit.
+          Prior funding doesn’t disqualify you.
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Do you fund solo or non-technical founders? Only software?</summary>
+        <div class="faq-body">
+          Yes to solo founders. Non-technical founders can apply, be ready to show how you’ll build (co-founder, early
+          hire,
+          no-code, contractors). We fund software and software-enabled businesses.
+        </div>
+      </details>
+    </div>
+
+    <!-- <h3 class="faq-subhead">Incorporating</h3> -->
+    <div class="faq">
+      <details class="faq-item">
+        <summary>Do we need to incorporate before applying? What if we’re non-US?</summary>
+        <div class="faq-body">
+          No, apply first. If accepted, we’ll guide you on a clean, standard setup.
+          Non-US companies are welcome; we’ll help you navigate a US entity if useful.
+        </div>
+      </details>
+    </div>
+
+    <!-- <h3 class="faq-subhead">Late applications</h3> -->
+    <div class="faq">
+      <details class="faq-item">
+        <summary>The deadline passed, should I apply late? When will I hear back?</summary>
+        <div class="faq-body">
+          Yes, submit. We review late apps as capacity allows and reply on a rolling basis.
+          If not this batch, we’ll consider you for the next.
+        </div>
+      </details>
+    </div>
+
+    <!-- <h3 class="faq-subhead">Other</h3> -->
+    <div class="faq">
+      <details class="faq-item">
+        <summary>What can I use the investment for?</summary>
+        <div class="faq-body">
+          Customer discovery, product, hiring your first builders/contractors, and go-to-market experiments.
+          Keep it focused on learning velocity and growth.
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section fade-in">
+    <h2>Get In Touch</h2>
+    <p>Ready to take your first flight? Connect with our team to learn more about T1751 and how we can help your idea
+      soar. Whether you're at the very beginning of your entrepreneurial journey or ready to scale, we're here to guide
+      you.</p>
+    <p><strong>Email:</strong> founders@t1751.com &nbsp;|&nbsp; <strong>Phone:</strong> (555) 175-1751 &nbsp;|&nbsp;
+      <strong>Address:</strong> 5999 New Wilke Rd Bldg. 500, Rolling Meadows, IL 60008
+    </p>
+  </section>
+
+  <script>
+    // ---------- URL param for BG mode: ?bg=particles | wave | rings ----------
+    const qs = new URLSearchParams(location.search);
+    const BG_MODE = (qs.get('bg') || 'particles').toLowerCase(); // default 'particles'
+
+    // Theme (persisted)
+    const themeToggle = document.getElementById('theme-toggle');
+    const storedTheme = localStorage.getItem('t1751-theme');
+    if (storedTheme === 'dark' || (!storedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.body.classList.add('dark');
+      if (themeToggle) themeToggle.textContent = '🌞';
+    }
+    themeToggle?.addEventListener('click', () => {
+      const dark = document.body.classList.toggle('dark');
+      themeToggle.textContent = dark ? '🌞' : '🌙';
+      localStorage.setItem('t1751-theme', dark ? 'dark' : 'light');
+    });
+
+    // Mobile menu
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    mobileBtn?.addEventListener('click', () => {
+      navLinks?.classList.toggle('active');
+      const expanded = mobileBtn.getAttribute('aria-expanded') === 'true';
+      mobileBtn.setAttribute('aria-expanded', String(!expanded));
+    });
+
+    // Smooth anchors + close mobile menu
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const t = document.querySelector(a.getAttribute('href'));
+        t?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        navLinks?.classList.remove('active');
+        mobileBtn?.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    // Scroll effects
+    function handleScroll() {
+      const navbar = document.getElementById('navbar');
+      const fades = document.querySelectorAll('.fade-in');
+      if (window.scrollY > 100) navbar?.classList.add('scrolled'); else navbar?.classList.remove('scrolled');
+      const vTop = window.scrollY, vBottom = vTop + window.innerHeight;
+      fades.forEach(el => {
+        const top = el.offsetTop, bottom = top + el.offsetHeight;
+        if (bottom > vTop && top < vBottom) el.classList.add('visible');
+      });
+    }
+    window.addEventListener('scroll', handleScroll);
+
+    // ---------- Three.js Background: Modes ----------
+    let scene, camera, renderer, obj, clock;
+    function initRenderer() {
+      renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three-canvas'), alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    }
+    function initCamera() {
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2000);
+      camera.position.z = 900;
+    }
+    function initScene() {
+      scene = new THREE.Scene();
+      scene.fog = new THREE.Fog(0x000000, 1200, 2000);
+    }
+
+    function particlesMode() {
+      const geometry = new THREE.BufferGeometry();
+      const vertices = [], colors = [];
+      for (let i = 0; i < 900; i++) {
+        vertices.push((Math.random() - 0.5) * 2200, (Math.random() - 0.5) * 2200, (Math.random() - 0.5) * 2200);
+        const c = new THREE.Color(); c.setHSL(0.28 + Math.random() * 0.05, 0.35, 0.45 + Math.random() * 0.2);
+        colors.push(c.r, c.g, c.b);
+      }
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+      const mat = new THREE.PointsMaterial({ size: 2, vertexColors: true, transparent: true, opacity: 0.55 });
+      obj = new THREE.Points(geometry, mat);
+      scene.add(obj);
+    }
+
+    function waveMode() {
+      const w = 140, h = 90, seg = 18;
+      const geom = new THREE.PlaneGeometry(w * seg, h * seg, w, h);
+      const mat = new THREE.MeshBasicMaterial({ wireframe: true, color: 0x4a7d62, transparent: true, opacity: 0.6 });
+      obj = new THREE.Mesh(geom, mat);
+      obj.rotation.x = -Math.PI / 3;
+      scene.add(obj);
+      clock = new THREE.Clock();
+      obj.userData.animate = () => {
+        const t = clock.getElapsedTime() * 1.2;
+        const pos = geom.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+          const x = pos.getX(i), y = pos.getY(i);
+          const z = Math.sin(x * 0.01 + t) * 8 + Math.cos(y * 0.01 - t) * 8;
+          pos.setZ(i, z);
+        }
+        pos.needsUpdate = true;
+      };
+    }
+
+    function ringsMode() {
+      const group = new THREE.Group();
+      const material = new THREE.MeshStandardMaterial({ color: 0x7aa690, roughness: 0.4, metalness: 0.25 });
+      for (let i = 0; i < 5; i++) {
+        const torus = new THREE.Mesh(new THREE.TorusGeometry(120 + i * 60, 14, 16, 100), material);
+        torus.rotation.x = i * 0.3; torus.rotation.y = i * 0.2;
+        group.add(torus);
+      }
+      const light1 = new THREE.PointLight(0xf4d180, 1.2, 0); light1.position.set(300, 200, 400);
+      const light2 = new THREE.PointLight(0x88caa7, 1.0, 0); light2.position.set(-300, -200, -200);
+      scene.add(light1, light2);
+      obj = group; scene.add(obj);
+    }
+
+    function init() {
+      initRenderer(); initCamera(); initScene();
+      if (BG_MODE === 'wave') waveMode();
+      else if (BG_MODE === 'rings') ringsMode();
+      else particlesMode();
+      animate();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (obj) {
+        if (obj.userData.animate) obj.userData.animate();
+        obj.rotation.y += 0.0008;
+      }
+      renderer.render(scene, camera);
+    }
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    window.addEventListener('resize', onResize);
+
+    // Init
+    window.addEventListener('load', () => { init(); handleScroll(); });
+  </script>
+</body>
+
+</html>
